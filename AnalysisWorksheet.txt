@@ -1,0 +1,77 @@
+﻿Instance Variables and Methods
+class Editor:
+* private TextList textList;
+* private int cursorX;
+* private int cursorY;
+* private void handleDownArrow();
+* private void handleUpArrow();
+* private void handleLeftArrow();
+* private void handleRightArrow();
+* private void handleClick(int cursorX, int cursorY);
+*       /***************************************
+      render all the text, update a 2D vecter textVector, 1 dimension is x position, 
+1 dimension is y position,  value is the address of the corresponding text.
+     *****************************************/
+* private void renderText();
+
+
+
+
+class TextList
+* private class Node: use node to create a linkedlist.
+* private Text[][] textVector; //2D vecter for rendering
+* private Node currentText
+* void insert(Text insertedText, Group root): This adds the given Text to the string in currentText
+* void delete(Group root): Deletes the character at the currentText
+* Text getCurrentText(): returns currentText.item
+* Text getPreviousText(): point currentText at the previous text then return currentText.item
+* Text getNextText(): point currentText at the next text then return currentText.item
+* void findText(cursorX, cursorY): find corresponding Text and update the currentText
+* void textMapping(x, y, Text): map cursorX and cursorY to the current text 
+* public void resize(x, y):if x or y is larger than textVector’s xsize or ysize , then resize.
+* renderText();
+
+
+
+
+
+
+Runtime constraints:
+* Inserting/deleting characters: Must be constant time.
+* Changing cursor position with arrow keys: Must be constant time.
+* Changing cursor position with clicks: Must be constant time.
+* Rendering text: Must be linear time.
+
+
+Analysis: Insertion/Deletion
+* Insertion: User types the character ‘s’. We create a Text insertedText = new Text(‘s’), also set its fontname, origin and fontsize,  add it to the root, then call textList.insert(insertedText). The insertedText will be inserted at position currentText, and currentText will point at insertedText. Then size += 1.
+* Deletion: User presses the Backspace key. textList.delete(root) will be called. The text at currentText will be deleted, and removed from the root(This happens inside of the delete() method, so root needs to be passed in). Then set currentText to the previous text. If size > 0 , then size -=1 .
+* Insertion and deletion runtime: both can be very fast  
+
+
+Analysis: Changing Cursor Position With Arrow Keys:
+* User pressed down arrow: Need to update currentText! We call handleDownArrow().
+   * handleDownArrow: At this time we have current cursorX and cursorY. Create a tempCursorX = cursorX. Iterate through textList by tempCursorX = getNextText().getX() starting at current text, until tempCursorX = cursorX again. Then cursorX = tempCursorX, cursorY = getCurrentText().getY(). 
+currentText will be updated inside of each called getNextText().
+Then cursor can be updated. 
+   * handleDownArrow runtime: proportional to the length of the line.
+
+
+* User pressed up arrow: similar to down arrow
+* User pressed left arrow: Then cursorX = getCurrentText().getX(). Then call getPreviousText() to update currentText. Then update the cursor.
+* User pressed right arrow: Then cursorX = getCurrentText().getX() + getCurrentText().getWidth(). Then call getNextText() to update currentText. Then update the cursor.
+Analysis: Changing Cursor Position With Clicks:
+* clicks should return the cursorX and cursorY. update currentText by textList.findText(cursorX, cursorY)
+Analysis: Rendering Text
+* textList.renderText(): render all text, always start from the beginning of textList.
+        set the local variable x and y to be 0 for the first text. set textList.textMapping(x, y). Then iterate through the textList. Inside the loop, the operation should be:
+x = x + getCurrentText().getWidth();
+if (x > windowswidth) {
+x = 0;
+y = y +getCurrentText().getHeight();
+}
+nextText = getNextText();
+nextText.setX(x);
+nextText.setY(y);
+           textList.resize(x, y);
+textList.textMapping(x, y);
